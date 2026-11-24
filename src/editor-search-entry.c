@@ -23,6 +23,7 @@
 #include <glib/gi18n.h>
 
 #include "editor-search-entry-private.h"
+#include "editor-utils-private.h"
 
 struct _EditorSearchEntry
 {
@@ -168,18 +169,18 @@ editor_search_entry_class_init (EditorSearchEntryClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, on_text_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, on_text_notify_cb);
 
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, GDK_CONTROL_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", FALSE);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, GDK_CONTROL_MASK, "search.move-next", "b", FALSE);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, EDITOR_PRIMARY_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", FALSE);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, EDITOR_PRIMARY_MASK, "search.move-next", "b", FALSE);
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Down, 0, "search.move-next", "b", FALSE);
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Up, 0, "search.move-previous", "b", FALSE);
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Return, 0, "search.move-next", "b", FALSE);
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Enter, 0, "search.move-next", "b", FALSE);
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Return, GDK_SHIFT_MASK, "search.move-previous", "b", FALSE);
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Enter, GDK_SHIFT_MASK, "search.move-previous", "b", FALSE);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Return, GDK_CONTROL_MASK, "search.move-next", "b", TRUE);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Enter, GDK_CONTROL_MASK, "search.move-next", "b", TRUE);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Return, GDK_CONTROL_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", TRUE);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Enter, GDK_CONTROL_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", TRUE);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Return, EDITOR_PRIMARY_MASK, "search.move-next", "b", TRUE);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Enter, EDITOR_PRIMARY_MASK, "search.move-next", "b", TRUE);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Return, EDITOR_PRIMARY_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", TRUE);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Enter, EDITOR_PRIMARY_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", TRUE);
 }
 
 static void

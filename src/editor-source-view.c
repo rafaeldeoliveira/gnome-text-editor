@@ -306,7 +306,7 @@ on_scroll_scrolled_cb (GtkEventControllerScroll *scroll,
 
   mods = gtk_event_controller_get_current_event_state (GTK_EVENT_CONTROLLER (scroll));
 
-  if ((mods & GDK_CONTROL_MASK) != 0)
+  if ((mods & EDITOR_PRIMARY_MASK) != 0)
     {
       editor_source_view_zoom (self, dy < 0 ? 1 : -1);
       return TRUE;
@@ -326,7 +326,7 @@ on_scroll_begin_cb (GtkEventControllerScroll *scroll,
 
   state = gtk_event_controller_get_current_event_state (GTK_EVENT_CONTROLLER (scroll));
 
-  if (state & GDK_CONTROL_MASK)
+  if (state & EDITOR_PRIMARY_MASK)
     gtk_event_controller_scroll_set_flags (scroll,
                                            GTK_EVENT_CONTROLLER_SCROLL_VERTICAL |
                                            GTK_EVENT_CONTROLLER_SCROLL_DISCRETE);
@@ -772,17 +772,34 @@ editor_source_view_class_init (EditorSourceViewClass *klass)
   gtk_widget_class_install_action (widget_class, "buffer.delete-line", NULL, editor_source_view_action_delete_line);
   gtk_widget_class_install_action (widget_class, "buffer.duplicate-line", NULL, editor_source_view_action_duplicate_line);
 
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_plus, GDK_CONTROL_MASK, "page.zoom-in", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Add, GDK_CONTROL_MASK, "page.zoom-in", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_equal, GDK_CONTROL_MASK, "page.zoom-in", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_minus, GDK_CONTROL_MASK, "page.zoom-out", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Subtract, GDK_CONTROL_MASK, "page.zoom-out", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_0, GDK_CONTROL_MASK, "page.zoom-one", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_l, GDK_CONTROL_MASK, "buffer.select-line", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_d, GDK_CONTROL_MASK, "buffer.delete-line", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_plus, EDITOR_PRIMARY_MASK, "page.zoom-in", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Add, EDITOR_PRIMARY_MASK, "page.zoom-in", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_equal, EDITOR_PRIMARY_MASK, "page.zoom-in", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_minus, EDITOR_PRIMARY_MASK, "page.zoom-out", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Subtract, EDITOR_PRIMARY_MASK, "page.zoom-out", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_0, EDITOR_PRIMARY_MASK, "page.zoom-one", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_l, EDITOR_PRIMARY_MASK, "buffer.select-line", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_d, EDITOR_PRIMARY_MASK, "buffer.delete-line", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, EDITOR_PRIMARY_MASK, "search.move-next", "b", FALSE);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, EDITOR_PRIMARY_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", FALSE);
+
+#ifdef __APPLE__
+  /* Command-Option-D shows and hides the Dock, so use Command-Shift-D */
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_d, GDK_META_MASK|GDK_SHIFT_MASK, "buffer.duplicate-line", NULL);
+
+  /* Standard macOS deletion keys that GtkTextView does not provide there:
+   * Command-Backspace/Delete to the start/end of the line, and
+   * Option-Delete (fn-Option-Backspace) to the end of the word.
+   */
+  gtk_widget_class_add_binding_signal (widget_class, GDK_KEY_BackSpace, GDK_META_MASK,
+                                       "delete-from-cursor", "(ii)", GTK_DELETE_PARAGRAPH_ENDS, -1);
+  gtk_widget_class_add_binding_signal (widget_class, GDK_KEY_Delete, GDK_META_MASK,
+                                       "delete-from-cursor", "(ii)", GTK_DELETE_PARAGRAPH_ENDS, 1);
+  gtk_widget_class_add_binding_signal (widget_class, GDK_KEY_Delete, GDK_ALT_MASK,
+                                       "delete-from-cursor", "(ii)", GTK_DELETE_WORD_ENDS, 1);
+#else
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_d, GDK_CONTROL_MASK|GDK_ALT_MASK, "buffer.duplicate-line", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, GDK_CONTROL_MASK, "search.move-next", "b", FALSE);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_g, GDK_CONTROL_MASK|GDK_SHIFT_MASK, "search.move-previous", "b", FALSE);
+#endif
 }
 
 static void

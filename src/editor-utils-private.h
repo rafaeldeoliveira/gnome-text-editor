@@ -26,7 +26,18 @@
 
 G_BEGIN_DECLS
 
-char                    *_editor_font_description_to_css        (const PangoFontDescription *font_desc);
+/* Modifier for the editor's own keyboard shortcuts: Command on macOS,
+ * Control everywhere else. The accelerators shown in editor-window.ui and
+ * shortcuts-dialog.ui are rewritten to match at build time on macOS by
+ * build-aux/macos/macos-shortcuts.py; keep the two in sync.
+ */
+#ifdef __APPLE__
+# define EDITOR_PRIMARY_MASK GDK_META_MASK
+#else
+# define EDITOR_PRIMARY_MASK GDK_CONTROL_MASK
+#endif
+
+char                    *_editor_font_description_to_css       (const PangoFontDescription *font_desc);
 void                     _editor_widget_hide_with_fade          (GtkWidget                  *widget);
 void                     _editor_widget_hide_with_fade_delay    (GtkWidget                  *widget,
                                                                  guint                       delay);

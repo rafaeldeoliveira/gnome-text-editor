@@ -66,9 +66,25 @@ editor_deps = [
   enchant_dep,
 ]
 
+# On macOS, show Command-based shortcuts in menus and the shortcuts dialog
+# (see EDITOR_PRIMARY_MASK). The rewritten copies in the build directory
+# take precedence over the originals when compiling resources.
+editor_ui_overrides = []
+if host_machine.system() == 'darwin'
+  macos_shortcuts = find_program('../build-aux/macos/macos-shortcuts.py')
+  foreach ui: ['editor-window.ui', 'shortcuts-dialog.ui']
+    editor_ui_overrides += custom_target(ui,
+        input: ui,
+       output: ui,
+      command: [macos_shortcuts, '@INPUT@', '@OUTPUT@'],
+    )
+  endforeach
+endif
+
 editor_sources += gnome.compile_resources('editor-resources',
   'org.gnome.TextEditor.gresource.xml',
-  c_name: 'editor'
+        c_name: 'editor',
+  dependencies: editor_ui_overrides,
 )
 
 editor_enums_headers = [

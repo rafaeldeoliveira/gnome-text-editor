@@ -322,7 +322,12 @@ static void
 editor_application_startup (GApplication *application)
 {
   static const char *patterns[] = { "org.gnome.*", NULL };
+  /* GTK parses <Primary> as Control on every platform */
+#ifdef __APPLE__
+  static const char *quit_accels[] = { "<Meta>Q", NULL };
+#else
   static const char *quit_accels[] = { "<Primary>Q", NULL };
+#endif
   static const char *help_accels[] = { "F1", NULL };
 
   EditorApplication *self = (EditorApplication *)application;

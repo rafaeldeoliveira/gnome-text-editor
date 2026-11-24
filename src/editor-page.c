@@ -963,7 +963,7 @@ editor_page_class_init (EditorPageClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, font_scale_changed_cb);
 
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_Escape, 0, "search.hide", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_i, GDK_CONTROL_MASK, "page.show-goto-line", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_i, EDITOR_PRIMARY_MASK, "page.show-goto-line", NULL);
 
   g_type_ensure (EDITOR_TYPE_INFO_BAR);
   g_type_ensure (EDITOR_TYPE_POSITION_LABEL);

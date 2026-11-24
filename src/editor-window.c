@@ -35,6 +35,12 @@
 #include "editor-utils-private.h"
 #include "editor-window-private.h"
 
+#ifdef __APPLE__
+# define EDITOR_PAGE_SWITCH_MASK GDK_META_MASK
+#else
+# define EDITOR_PAGE_SWITCH_MASK GDK_ALT_MASK
+#endif
+
 typedef struct
 {
   char *draft_id;
@@ -942,38 +948,43 @@ editor_window_class_init (EditorWindowClass *klass)
   gtk_widget_class_install_action (widget_class, "win.unfullscreen", NULL, editor_window_unfullscreen_action);
   gtk_widget_class_install_action (widget_class, "win.toggle-fullscreen", NULL, editor_window_toggle_fullscreen);
 
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_w, GDK_CONTROL_MASK, "win.close-page-or-window", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_o, GDK_CONTROL_MASK, "win.open", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_k, GDK_CONTROL_MASK, "win.focus-search", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_t, GDK_CONTROL_MASK, "session.new-draft", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_n, GDK_CONTROL_MASK, "app.new-window", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_s, GDK_CONTROL_MASK, "page.save", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_s, GDK_CONTROL_MASK | GDK_SHIFT_MASK, "page.save-as", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_p, GDK_CONTROL_MASK, "page.print", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_c, GDK_CONTROL_MASK | GDK_SHIFT_MASK, "page.copy-all", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_1, GDK_ALT_MASK, "page.change", "i", 1);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_2, GDK_ALT_MASK, "page.change", "i", 2);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_3, GDK_ALT_MASK, "page.change", "i", 3);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_4, GDK_ALT_MASK, "page.change", "i", 4);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_5, GDK_ALT_MASK, "page.change", "i", 5);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_6, GDK_ALT_MASK, "page.change", "i", 6);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_7, GDK_ALT_MASK, "page.change", "i", 7);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_8, GDK_ALT_MASK, "page.change", "i", 8);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_9, GDK_ALT_MASK, "page.change", "i", 9);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_n, GDK_CONTROL_MASK | GDK_SHIFT_MASK, "page.move-to-new-window", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_f, GDK_CONTROL_MASK, "page.begin-search", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_w, EDITOR_PRIMARY_MASK, "win.close-page-or-window", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_o, EDITOR_PRIMARY_MASK, "win.open", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_k, EDITOR_PRIMARY_MASK, "win.focus-search", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_t, EDITOR_PRIMARY_MASK, "session.new-draft", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_n, EDITOR_PRIMARY_MASK, "app.new-window", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_s, EDITOR_PRIMARY_MASK, "page.save", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_s, EDITOR_PRIMARY_MASK | GDK_SHIFT_MASK, "page.save-as", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_p, EDITOR_PRIMARY_MASK, "page.print", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_c, EDITOR_PRIMARY_MASK | GDK_SHIFT_MASK, "page.copy-all", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_1, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 1);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_2, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 2);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_3, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 3);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_4, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 4);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_5, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 5);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_6, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 6);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_7, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 7);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_8, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 8);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_9, EDITOR_PAGE_SWITCH_MASK, "page.change", "i", 9);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_n, EDITOR_PRIMARY_MASK | GDK_SHIFT_MASK, "page.move-to-new-window", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_f, EDITOR_PRIMARY_MASK, "page.begin-search", NULL);
+#ifdef __APPLE__
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_f, GDK_META_MASK | GDK_ALT_MASK, "page.begin-replace", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_m, GDK_META_MASK, "window.minimize", NULL);
+#else
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_h, GDK_CONTROL_MASK, "page.begin-replace", NULL);
+#endif
   gtk_widget_class_add_binding_action (widget_class, GDK_KEY_F10, 0, "win.show-primary-menu", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_comma, GDK_CONTROL_MASK, "win.show-preferences", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_question, GDK_CONTROL_MASK, "win.alternate-help-overlay", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_t, GDK_CONTROL_MASK|GDK_SHIFT_MASK, "win.undo-close-page", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_comma, EDITOR_PRIMARY_MASK, "win.show-preferences", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_question, EDITOR_PRIMARY_MASK, "win.alternate-help-overlay", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_t, EDITOR_PRIMARY_MASK|GDK_SHIFT_MASK, "win.undo-close-page", NULL);
 
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_plus, GDK_CONTROL_MASK, "page.zoom-in", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Add, GDK_CONTROL_MASK, "page.zoom-in", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_equal, GDK_CONTROL_MASK, "page.zoom-in", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_minus, GDK_CONTROL_MASK, "page.zoom-out", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_0, GDK_CONTROL_MASK, "page.zoom-one", NULL);
-  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_0, GDK_CONTROL_MASK, "page.zoom-one", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_plus, EDITOR_PRIMARY_MASK, "page.zoom-in", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_Add, EDITOR_PRIMARY_MASK, "page.zoom-in", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_equal, EDITOR_PRIMARY_MASK, "page.zoom-in", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_minus, EDITOR_PRIMARY_MASK, "page.zoom-out", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_0, EDITOR_PRIMARY_MASK, "page.zoom-one", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_KP_0, EDITOR_PRIMARY_MASK, "page.zoom-one", NULL);
 
   _editor_window_class_actions_init (klass);
 
