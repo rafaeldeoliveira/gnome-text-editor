@@ -83,6 +83,15 @@ config_h.set_quoted('PACKAGE_NAME', 'Text Editor')
 config_h.set_quoted('PACKAGE_DATADIR', join_paths(get_option('prefix'), get_option('datadir'), 'gnome-text-editor'))
 config_h.set10('DEVELOPMENT_BUILD', get_option('development'))
 
+# On macOS the .app bundle must point enchant at its bundled providers.
+enchant_dep = dependency('', required: false)
+if host_machine.system() == 'darwin'
+  enchant_dep = dependency('enchant-2', required: false)
+  if enchant_dep.found()
+    config_h.set('HAVE_ENCHANT', 1)
+  endif
+endif
+
 global_c_args = [
   '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_@0@_@1@'.format(glib_major, glib_minor),
   '-DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_@0@_@1@'.format(glib_major, glib_minor),

@@ -63,6 +63,7 @@ editor_deps = [
   libgtksourceview_dep,
   libadwaita_dep,
   spelling_dep,
+  enchant_dep,
 ]
 
 editor_sources += gnome.compile_resources('editor-resources',

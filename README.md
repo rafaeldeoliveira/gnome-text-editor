@@ -37,3 +37,21 @@ To be a delightful and pleasing default text editor experience for GNOME.
 ## Try it Out!
 
 You can install our Nightly build from Flatpak using [org.gnome.TextEditor.Devel.flatpakref](https://nightly.gnome.org/repo/appstream/org.gnome.TextEditor.Devel.flatpakref).
+
+## Building on macOS
+
+Install the dependencies with [Homebrew](https://brew.sh):
+
+```sh
+brew install meson ninja pkg-config gtk4 libadwaita gtksourceview5 libspelling \
+             editorconfig itstool desktop-file-utils adwaita-icon-theme librsvg
+```
+
+Then build a self-contained `Text Editor.app` (it does not need Homebrew at
+runtime) and optionally copy it into `/Applications`:
+
+```sh
+build-aux/macos/bundle.py --install
+```
+
+The app is placed in `_build-macos/`. Pass `--devel` for a development build.

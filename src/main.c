@@ -29,8 +29,64 @@
 # include <enchant.h>
 #endif
 
+#ifdef __APPLE__
+# include <mach-o/dyld.h>
+#endif
+
 #include "build-ident.h"
 #include "editor-application-private.h"
+
+#ifdef __APPLE__
+/* Returns Contents/Resources when running from inside a relocatable
+ * macOS .app bundle (see build-aux/macos/bundle.py), otherwise NULL.
+ */
+static char *
+get_macos_bundle_resources (void)
+{
+  g_autofree char *exe = NULL;
+  g_autofree char *real = NULL;
+  g_autofree char *macos_dir = NULL;
+  g_autofree char *contents = NULL;
+  g_autofree char *dir_name = NULL;
+  g_autofree char *resources = NULL;
+  uint32_t size = 0;
+
+  _NSGetExecutablePath (NULL, &size);
+  exe = g_malloc0 (size + 1);
+  if (_NSGetExecutablePath (exe, &size) != 0)
+    return NULL;
+
+  if (!(real = realpath (exe, NULL)))
+    return NULL;
+
+  macos_dir = g_path_get_dirname (real);
+  dir_name = g_path_get_basename (macos_dir);
+  if (g_strcmp0 (dir_name, "MacOS") != 0)
+    return NULL;
+
+  contents = g_path_get_dirname (macos_dir);
+  resources = g_build_filename (contents, "Resources", NULL);
+  if (!g_file_test (resources, G_FILE_TEST_IS_DIR))
+    return NULL;
+
+  return g_steal_pointer (&resources);
+}
+
+static void
+rebind_library_textdomains (GApplication *app,
+                            const char   *localedir)
+{
+  /* GTK and friends bind their domains to their compile-time prefix
+   * during startup, so this must run after the default handler.
+   */
+  static const char * const domains[] = {
+    "gtk40", "libadwaita", "gtksourceview-5", "libspelling",
+  };
+
+  for (guint i = 0; i < G_N_ELEMENTS (domains); i++)
+    bindtextdomain (domains[i], localedir);
+}
+#endif
 
 static void
 check_early_opts (int        *argc,
@@ -85,15 +141,38 @@ main (int   argc,
   g_autoptr(EditorApplication) app = NULL;
   gboolean standalone = FALSE;
   gboolean exit_after_startup = FALSE;
+  const char *localedir = LOCALEDIR;
   int ret;
+#ifdef __APPLE__
+  g_autofree char *bundle_resources = get_macos_bundle_resources ();
+  g_autofree char *bundle_localedir = NULL;
 
-  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  if (bundle_resources != NULL)
+    {
+      bundle_localedir = g_build_filename (bundle_resources, "share", "locale", NULL);
+      localedir = bundle_localedir;
+# ifdef HAVE_ENCHANT
+      /* Spell-checking providers live in Resources/lib/enchant-2 */
+      enchant_set_prefix_dir (bundle_resources);
+# endif
+    }
+#endif
+
+  bindtextdomain (GETTEXT_PACKAGE, localedir);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
 
   check_early_opts (&argc, &argv, &standalone, &exit_after_startup);
 
   app = _editor_application_new (standalone);
+
+#ifdef __APPLE__
+  if (bundle_localedir != NULL)
+    g_signal_connect (app,
+                      "startup",
+                      G_CALLBACK (rebind_library_textdomains),
+                      (gpointer) bundle_localedir);
+#endif
 
   if (exit_after_startup)
     g_signal_connect_after (app,

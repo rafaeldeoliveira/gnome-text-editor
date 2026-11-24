@@ -2,3 +2,7 @@ build
 *.swp
 .buildconfig
 .flatpak-builder
+_build
+_install
+_build-macos
+.DS_Store
